@@ -1,0 +1,155 @@
+---
+title: "第二次作业"
+author: "赵映辉"
+output: 
+  pdf_document:
+    latex_engine: xelatex
+header-includes:
+  - \usepackage{ctex}
+---
+
+## 第一问
+```{r}
+library(tidyverse)
+library(readxl)
+
+```
+
+
+## 第三问
+
+1. 请统计 words 的单词数量
+
+```{r}
+library(stringr)
+
+length(words)
+```
+
+2. 请统计 words 中所有辅音结尾的单词数量，以及其所占百分比
+
+```{r}
+
+regexUse = "[^aeiou]$"
+
+sum(str_count(words, regexUse))
+
+sum(str_count(words, regexUse)) / length(words)
+
+```
+
+3. 统计每个单词的长度，并画出分布图，请使用 pipe
+
+```{r}
+v = c()
+
+for(i in 1:length(words)) {
+  v[i] = nchar(words[i])
+}
+
+hist(v)
+
+```
+
+4. 请从 words 中每次取 10 个单词，统计辅音结尾的比率，并将该过程重复 1000 次，请说明你的发现
+
+```{r}
+
+rateArray = c()
+
+for(i in 1:1000) {
+  num = floor(runif(10, 1, length(words)))
+  count = 0;
+  
+  for(j in 1:10) {
+    if(str_detect(words[num[j]], "[^aeiou]$")) {
+      count = count + 1
+    }
+  }
+  
+  rateArray[i] = count / 10
+}
+
+hist(rateArray)
+
+
+```
+
+可以看到每次取10个，得到的比率的中位数和整体的比率相差无几
+
+
+5. 请将第 4 问写成函数，函数变量有两个，为：“抽取单词个数” x 和 “重复次数” n
+
+```{r}
+
+countRate = function(x, n) {
+  rateArray = c()
+  
+  for(i in 1:n) {
+    num = floor(runif(x, 1, length(words)))
+    count = 0;
+    
+    for(j in 1:x) {
+        if(str_detect(words[num[j]], "[^aeiou]$")) {
+          count = count + 1
+        }
+    }
+    
+    rateArray[i] = count / x
+  }
+
+  hist(rateArray)
+}
+
+```
+
+6. 请将单词按照其长度中值分为 “短单词” 和“长单词”，画出“单词元音个数”和“单词类型”的直方图。单词类型为“短单词” 和“长单词”。请问你发现了什么？
+
+```{r}
+table1 = tibble(word = words)
+
+median_length <- median(nchar(words))
+
+table1 = table1 %>%
+  mutate(
+    length = nchar(word),                               
+    type = if_else(length <= median_length, 'short', 'long'),
+    vowel_count = str_count(word, "[aeiou]")
+  )
+
+ggplot(table1, aes(x = vowel_count, fill = type)) +
+  geom_histogram(binwidth = 1, position = "dodge", color = "black") +
+  labs(
+    title = "单词元音个数与单词类型的分布",
+    x = "元音个数",
+    y = "频数",
+    fill = "单词类型"
+  ) +
+  theme_minimal()
+```
+
+短单词的元音个数主要是1-2个，而长单词的元音个数主要是3-4个
+
+7. 请用回归分析“单词类别”对 “单词中元音个数” 的影响，给出你的估计模型和估计结果
+```{r}
+
+table2 = table2 %>%
+  mutate(
+    length = nchar(word),                               
+    type = if_else(length <= median_length, 0, 1),
+    vowel_count = str_count(word, "[aeiou]")
+  )
+
+dataUse = lm(vowel_count ~ type, data = table2)
+
+summary(dataUse)
+
+```
+
+vowel_count = 1.51 + 1.19 * type
+
+8. 请用优化的思维估计 7 中的模型参数
+不会
+
+9. 请用模拟的方法估计 7 中的模型参数
+不会
