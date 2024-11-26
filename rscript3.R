@@ -6,9 +6,9 @@ funResult = function(N, min, max) {
   randomData = runif(N, min, max)
   resultData = fn(randomData)
   
-  count = (max - min) * mean(resultData)
+  count = mean(resultData)
   
-  return (randomData);
+  return (count);
 }
 
 funResult(100000, 0, 1)

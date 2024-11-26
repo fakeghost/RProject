@@ -27,15 +27,24 @@ Income2 = table2 %>% filter(Is_Default == 1)
 
 result = inner_join(Income1, Income2, by="ID")
 
-# 第四问 (收入越低，员工待的时间越少)
-ggplot(mergeResult, aes(x = Income, y = Years_at_Employer)) + geom_point()
+# 第四问 (收入越低，员工待的时间越少，员工待的越久，收入越高)
+ggplot(mergeResult, aes(x = Years_at_Employer, y = Income)) + geom_point()
 
 # 第五问
+ggplot(mergeResult, aes(x = Years_at_Employer, y = Income, alpha = Is_Default)) + geom_point()
 
 # 第六问
+ggplot(mergeResult, aes(x = Years_at_Employer, y = Income, shape = factor(Is_Default))) + geom_point()
 
 # 第七问
+loseData = colSums(is.na(mergeResult))
+
+cleanData = drop_na(mergeResult, "Credit_Card_Debt", "Automobile_Debt", "Is_Default")
 
 # 第八问
+removeData = boxplot.stats(cleanData$Income)$out
+lastData = cleanData %>% filter(!Income %in% removeData)
 
 # 第九问
+hist(lastData$Income)
+
